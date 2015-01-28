@@ -1,12 +1,13 @@
-#coding:utf8
+# coding:utf8
 '''
 Created on 2013-8-7
 
 @author: lan (www.9miao.com)
 '''
 from gtwisted.core import reactor
-from gfirefly.server.globalobject import webserviceHandle,GlobalObject
+from gfirefly.server.globalobject import webserviceHandle, GlobalObject
 reactor = reactor
+
 
 @webserviceHandle('/stop')
 def stop():
@@ -14,8 +15,9 @@ def stop():
     '''
     for child in GlobalObject().root.childsmanager._childs.values():
         child.callbackChildNotForResult('serverStop')
-    reactor.callLater(0.5,reactor.stop)
+    reactor.callLater(0.5, reactor.stop)
     return "stop"
+
 
 @webserviceHandle('/reloadmodule')
 def reloadmodule():
@@ -24,7 +26,3 @@ def reloadmodule():
     for child in GlobalObject().root.childsmanager._childs.values():
         child.callbackChildNotForResult('sreload')
     return "reload"
-
-
-
-

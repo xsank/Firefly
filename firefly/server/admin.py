@@ -1,10 +1,10 @@
-#coding:utf8
+# coding:utf8
 '''
 Created on 2013-8-12
 
 @author: lan (www.9miao.com)
 '''
-from globalobject import GlobalObject,masterserviceHandle
+from globalobject import GlobalObject, masterserviceHandle
 from twisted.internet import reactor
 from twisted.python import log
 
@@ -18,8 +18,9 @@ def serverStop():
     log.msg('stop')
     if GlobalObject().stophandler:
         GlobalObject().stophandler()
-    reactor.callLater(0.5,reactor.stop)
+    reactor.callLater(0.5, reactor.stop)
     return True
+
 
 @masterserviceHandle
 def sreload():
@@ -30,9 +31,9 @@ def sreload():
         reload(GlobalObject().reloadmodule)
     return True
 
+
 @masterserviceHandle
 def remote_connect(rname, rhost):
     """
     """
     GlobalObject().remote_connect(rname, rhost)
-

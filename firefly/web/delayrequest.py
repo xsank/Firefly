@@ -1,18 +1,19 @@
-#coding:utf8
+# coding:utf8
 '''
 Created on 2013-9-3
 
 @author: lan
 '''
-from twisted.web.server import Request,Site
+from twisted.web.server import Request, Site
 from twisted.internet import defer
-from twisted.web import http,html
+from twisted.web import http, html
 from twisted.python import log, reflect
 from twisted.web import resource
 from twisted.web.error import UnsupportedMethod
 from twisted.web.microdom import escape
 
-import string,types
+import string
+import types
 
 NOT_DONE_YET = 1
 
@@ -25,10 +26,10 @@ supportedMethods = ('GET', 'HEAD', 'POST')
 
 
 class DelayRequest(Request):
-    
+
     def __init__(self, *args, **kw):
-        Request.__init__(self,*args, **kw)
-        
+        Request.__init__(self, *args, **kw)
+
     def render(self, resrc):
         """
         Ask a resource to render itself.
@@ -37,7 +38,7 @@ class DelayRequest(Request):
         """
         try:
             body = resrc.render(self)
-        except UnsupportedMethod, e:
+        except UnsupportedMethod as e:
             allowedMethods = e.allowedMethods
             if (self.method == "HEAD") and ("GET" in allowedMethods):
                 # We must support HEAD (RFC 2616, 5.1.1).  If the
@@ -70,11 +71,11 @@ class DelayRequest(Request):
                 s = ('''Your browser approached me (at %(URI)s) with'''
                      ''' the method "%(method)s".  I only allow'''
                      ''' the method%(plural)s %(allowed)s here.''' % {
-                    'URI': escape(self.uri),
-                    'method': self.method,
-                    'plural': ((len(allowedMethods) > 1) and 's') or '',
-                    'allowed': string.join(allowedMethods, ', ')
-                    })
+                         'URI': escape(self.uri),
+                         'method': self.method,
+                         'plural': ((len(allowedMethods) > 1) and 's') or '',
+                         'allowed': string.join(allowedMethods, ', ')
+                     })
                 epage = resource.ErrorPage(http.NOT_ALLOWED,
                                            "Method Not Allowed", s)
                 body = epage.render(self)
@@ -88,7 +89,8 @@ class DelayRequest(Request):
 
         if body == NOT_DONE_YET:
             return
-        if not isinstance(body, defer.Deferred) and type(body) is not types.StringType:
+        if not isinstance(body, defer.Deferred) and not isinstance(
+                body, types.StringType):
             body = resource.ErrorPage(
                 http.INTERNAL_SERVER_ERROR,
                 "Request did not return a string",
@@ -113,20 +115,17 @@ class DelayRequest(Request):
                 self.setHeader('content-length', str(len(body)))
                 self.write(body)
                 self.finish()
-                
-    def _deferwrite(self,body):
+
+    def _deferwrite(self, body):
         '''延迟等待数据返回
         '''
         self.setHeader('content-length', str(len(body)))
         self.write(body)
         self.finish()
-        
-        
+
+
 class DelaySite(Site):
-    
-    def __init__(self, resource, logPath=None, timeout=60*60*12):
+
+    def __init__(self, resource, logPath=None, timeout=60 * 60 * 12):
         Site.__init__(self, resource, logPath=logPath, timeout=timeout)
         self.requestFactory = DelayRequest
-        
-    
-    
